@@ -7,7 +7,6 @@ import re
 import json
 
 if not os.path.exists("wikimovies2010_2015.txt"):
-#    print "%%%%%%%%%%%%%%%%%% in path exists or not"
     file = codecs.open("wikimovies2010_2015.txt", "a")
     if os.stat("wikimovies2010_2015.txt").st_size==0:
         urls = ["http://en.wikipedia.org/wiki/List_of_American_films_of_2010",
@@ -31,7 +30,6 @@ if not os.path.exists("wikimovies2010_2015.txt"):
                 for no in node.findAll('a'):
                     movie = ''.join(no.findAll(text=True))
                     mov = movie.encode('utf-8')
-                   # print mov
                     file.writelines(str(mov)+" Year:"+str(year)+"\n")
             file.close()
 
@@ -40,17 +38,9 @@ elif os.path.exists("wikimovies2010_2015.txt"):
     i=0
     filemovies = open("wikimovies2010_2015.txt").read()
     movielist = filemovies.split("\n")
-
-
-    #req = urllib.urlopen("http://www.omdbapi.com/?t=B.O.O.%3A+Bureau+of+Otherworldly+Operations&y=2015&plot=short&r=json")
-    #res = json.load(req)
-
-
     for i in range(0,len(movielist)):
         title_yr = movielist[i].split(" Year:")
-
         t = str(title_yr[0])
-        #print t
         if ":" in t:
             t = str(t.replace(":","%3A"))
         title = t.replace(" ","+")
