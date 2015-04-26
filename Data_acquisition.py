@@ -21,18 +21,18 @@ for url in urls:
         for no in node.findAll('a'):
             movie = ''.join(no.findAll(text=True))
             mov = movie.encode('utf-8')
-            if "Dundee II" in mov:
-                mov ="ex"
             if ":" or "?" or "," or "/"in mov:
                 mov = str(mov.replace(":","%3A"))
                 mov = str(mov.replace("?","%3F"))
                 mov = str(mov.replace(",","%2C"))
                 mov = str(mov.replace("/","%2F"))
             mov = mov.replace(" ","+")
-            req = urllib2.urlopen("http://www.omdbapi.com/?t="+str(mov)+"&y="+str(year)+"&plot=short&r=json")
-            res = json.load(req)
-            if str(res) != None:
-                if not "u'Response': u'False'" in res:
+            try:
+                req = urllib2.urlopen("http://www.omdbapi.com/?t="+str(mov)+"&y="+str(year)+"&plot=short&r=json")
+                res = json.load(req)
+                if res["Response"] == "True":
                     file.writelines(str(res)+"\n")
                     print str(mov)
+            except:
+                None
 file.close()
