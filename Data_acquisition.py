@@ -1,52 +1,38 @@
 import codecs
-import urllib
 from bs4 import BeautifulSoup
 import urllib2
-import os
 import re
 import json
 
-if not os.path.exists("wikimovies2010_2015.txt"):
-    file = codecs.open("wikimovies2010_2015.txt", "a")
-    if os.stat("wikimovies2010_2015.txt").st_size==0:
-        urls = ["http://en.wikipedia.org/wiki/List_of_American_films_of_2010",
-            "http://en.wikipedia.org/wiki/List_of_American_films_of_2011",
-            "http://en.wikipedia.org/wiki/List_of_American_films_of_2012",
-            "http://en.wikipedia.org/wiki/List_of_American_films_of_2013",
-            "http://en.wikipedia.org/wiki/List_of_American_films_of_2014",
-            "http://en.wikipedia.org/wiki/List_of_American_films_of_2015"]
-
-        for url in urls:
-            page = urllib2.urlopen(url)
-            soup = BeautifulSoup(page.read())
-            if url != None:
-                yr=[]
-                yr = url.split('_')
-                year = yr[len(yr)-1]
-
-            file = codecs.open("wikimovies2010_2015.txt", "a")
-
-            for node in soup.findAll('i'):
-                for no in node.findAll('a'):
-                    movie = ''.join(no.findAll(text=True))
-                    mov = movie.encode('utf-8')
-                    file.writelines(str(mov)+" Year:"+str(year)+"\n")
-            file.close()
-
-elif os.path.exists("wikimovies2010_2015.txt"):
-    print "in else"
-    i=0
-    filemovies = open("wikimovies2010_2015.txt").read()
-    movielist = filemovies.split("\n")
-    for i in range(0,len(movielist)):
-        title_yr = movielist[i].split(" Year:")
-        t = str(title_yr[0])
-        if ":" in t:
-            t = str(t.replace(":","%3A"))
-        title = t.replace(" ","+")
-        print str(title)
-        req = urllib.urlopen("http://www.omdbapi.com/?t="+title+"&y="+str(title_yr[1])+"&plot=short&r=json")
-        res = json.load(req)
-        if res != None:
-           print res
-
+urls=[]
+for i in range(0,10):
+    u ="http://en.wikipedia.org/wiki/List_of_American_films_of_200"+str(i)
+    urls.append(u)
+for i in range(10,16):
+    u ="http://en.wikipedia.org/wiki/List_of_American_films_of_20"+str(i)
+    urls.append(u)
+file = codecs.open("wikimovies2000_2015.txt", "a")
+for url in urls:
+    page = urllib2.urlopen(url)
+    soup = BeautifulSoup(page.read())
+    searchObj = re.search(r'\d{4}', url)
+    year = searchObj.group()
+    for node in soup.findAll('i'):
+        for no in node.findAll('a'):
+            movie = ''.join(no.findAll(text=True))
+            mov = movie.encode('utf-8')
+            if "Dundee II" in mov:
+                mov ="ex"
+            if ":" or "?" or "," or "/"in mov:
+                mov = str(mov.replace(":","%3A"))
+                mov = str(mov.replace("?","%3F"))
+                mov = str(mov.replace(",","%2C"))
+                mov = str(mov.replace("/","%2F"))
+            mov = mov.replace(" ","+")
+            req = urllib2.urlopen("http://www.omdbapi.com/?t="+str(mov)+"&y="+str(year)+"&plot=short&r=json")
+            res = json.load(req)
+            if str(res) != None:
+                if not "u'Response': u'False'" in res:
+                    file.writelines(str(res)+"\n")
+                    print str(mov)
+file.close()
