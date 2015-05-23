@@ -1,4 +1,3 @@
-import codecs
 from bs4 import BeautifulSoup
 import urllib2
 import re
@@ -13,11 +12,11 @@ for i in range(10,16):
     u ="http://en.wikipedia.org/wiki/List_of_American_films_of_20"+str(i)
     urls.append(u)
 
-#file = codecs.open("wikimovies2000_2015.txt", "a")
 try:
     conn= pymongo.MongoClient()
-    print "Connected successfully!!!"
-    db = conn["mock"]
+    if( conn != None):
+        print "Connected successfully!!!"
+    db = conn["moviesDB"]
     seq = {'Title','Country','Writer','imdbRating',
            'Director','Actors','Year','Genre',
            'Awards','imdbVotes','imdbID'}
@@ -44,8 +43,8 @@ try:
                         db.movies.insert(movie)
                 except:
                     None
-    print list(db.movies.find())
-    #print "########################"
+    print "Completed Storing data"
+
     conn.close()
 except pymongo.errors.ConnectionFailure, e:
    print "Could not connect to MongoDB: %s" % e
