@@ -1,23 +1,22 @@
 import pymongo
-import re
 import numpy as np
 
-crew=[]
-imdb_ratings=[]
+a_rating=[]
+d_rating=[]
+w_rating=[]
 
 act = raw_input("Enter Actor/s in this movie (seperate with commas): ")
 actors = act.split(",")
-crew =crew + actors
 
 wri = raw_input("Enter Writer/s in this movie (seperate with commas): ")
 writer =wri.split(",")
-crew = crew + writer
 
 di = raw_input("Enter Director/s in this movie (seperate with commas): ")
 director =di.split(",")
-crew = crew + director
 
-print crew
+print "Actors are %s"% actors
+print "Directors are %s"% director
+print "Writers are %s"% writer
 
 try:
     conn = pymongo.MongoClient()
@@ -26,42 +25,47 @@ try:
     db = conn["moviesDB"]
 
     for j in actors:
-        print "Actor : %s"%j
         cur = db.movies.find({'Actors': {'$regex': j}})
         for a in cur:
-            imdb_ratings.append(a['imdbRating'])
-            #T2 = [map(int, x) for x in imdb_ratings]
-            #x = np.array(imdb_ratings)
-            #y = x.astype(np.float)
-        print "##############  ACTORS  #############"
-    #print y
+            q = a['imdbRating']
+            if(q == "N/A"):
+                q = '0.0'
+           # if(q == )
+            a_rating.append(q)
 
     for j in writer:
-        print "Writer: %s"%j
         cur = db.movies.find({'Writer': {'$regex': j}})
         for a in cur:
-            imdb_ratings.append(a['imdbRating'])
-            #T2 = [map(int, x) for x in imdb_ratings]
-            #x = np.array(imdb_ratings)
-            #y = x.astype(np.float)
-        print "############## WRITERS #################"
+            q = a['imdbRating']
+            if(q == "N/A"):
+                q = '0.0'
+            w_rating.append(q)
 
     for j in director:
-        print "Director %s"%j
-        cur = db.movies.find({'Writer': {'$regex': j}})
+        cur = db.movies.find({'Director': {'$regex': j}})
         for a in cur:
-            imdb_ratings.append(a['imdbRating'])
-            #T2 = [map(int, x) for x in imdb_ratings]
-            #x = np.array(imdb_ratings)
-            #y = x.astype(np.float)
-        print "############## DIRECTORS #################"
-    x = np.array(imdb_ratings)
-    y = x.astype(np.float)
-    print y
-    #e  = np.asarray(imdb_ratings)
-    mean =  np.mean(y)
-    print mean
-    #print "Avg imdbRating go" mean
+            q = a['imdbRating']
+            if(q == "N/A"):
+                q = '0.0'
+            d_rating.append(q)
+
+    ax = np.array(a_rating)
+    ay = ax.astype(np.float)
+    actor_mean =  np.mean(ay)
+    actor_dev = np.std(ay)
+    print "Average performance of Actors %s"%actors+" is %f"%actor_mean
+    #print "Std Deviation in Actor performances is %f"%actor_dev
+
+    dx = np.array(d_rating)
+    dy = dx.astype(np.float)
+    director_mean = np.mean(dy)
+    print "Average performance of Directors %s"%director+" is %f"%director_mean
+
+    wx = np.array(w_rating)
+    wy = wx.astype(np.float)
+    writer_mean =np.mean(wy)
+    print "Average performance of Writers %s"%writer+"is %f"%writer_mean
+
     conn.close()
 
 except pymongo.errors.ConnectionFailure, e:
