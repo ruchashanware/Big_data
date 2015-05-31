@@ -5,6 +5,10 @@ a_rating=[]
 d_rating=[]
 w_rating=[]
 
+a_awards=[]
+d_awards=[]
+w_awards=[]
+
 act = raw_input("Enter Actor/s in this movie (seperate with commas): ")
 actors = act.split(",")
 
@@ -26,8 +30,20 @@ try:
 
     for j in actors:
         cur = db.movies.find({'Actors': {'$regex': j}})
+
         for a in cur:
             q = a['imdbRating']
+            r = a['Awards']
+            print r
+            if(r =='N/A'):
+                awards = '0'
+            elif 'Oscar' in r or 'Golden Globe' in r or 'win' in r:
+                osc = r.split('Oscar')
+                gg = r.split('Golden Globe')
+                win = r.split('win')
+                o=osc[0]
+                print o
+
             if(q == "N/A"):
                 q = '0.0'
            # if(q == )
